@@ -1,0 +1,14 @@
+:root {
+    --color-primary: #242323;       /* основной цвет */
+    --color-secondary: #EDEDED;     /* вторичный */
+    --color-success: #198754;       /* успех */
+    --color-danger: #FF0000;        /* ошибка */
+    --color-warning: #FFB547;       /* предупреждение */
+    --color-info: #0dcaf0;          /* инфо */
+    --color-light: #FAFAFA;         /* светлый фон */
+    --color-dark: #212529;
+
+    --bg-main: #ffffff;             /* основной фон */
+    --text-main: #242323;           /* основной текст */
+}
+

@@ -50,7 +50,7 @@ export default function Header() {
                     {/* Иконки справа */}
                     <div className="d-flex align-items-center">
                         <Link href="/favorites" className="me-3">
-                            <i className="bi bi-heart fs-5"></i>
+                            <i className="bi bi-heart fs-5 text-primary"></i>
                         </Link>
                         <Link href="/cart" className="me-3">
                             <i className="bi bi-cart fs-5"></i>
