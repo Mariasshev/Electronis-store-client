@@ -10,7 +10,7 @@ export default function Header() {
             <div className="container">
                 {/* Логотип */}
                 <Link href="/" className="navbar-brand d-flex align-items-center">
-                    <Image src="/logo.png" alt="Logo" width={40} height={40} />
+                    {/*<Image src="/logo.png" alt="Logo" width={40} height={40} />*/}
                     <span className="ms-2 fw-bold">Cyber</span>
                 </Link>
 
@@ -53,10 +53,10 @@ export default function Header() {
                             <i className="bi bi-heart fs-5 text-primary"></i>
                         </Link>
                         <Link href="/cart" className="me-3">
-                            <i className="bi bi-cart fs-5"></i>
+                            <i className="bi bi-cart fs-5 text-primary"></i>
                         </Link>
                         <Link href="/profile">
-                            <i className="bi bi-person fs-5"></i>
+                            <i className="bi bi-person fs-5 text-primary"></i>
                         </Link>
                     </div>
                 </div>

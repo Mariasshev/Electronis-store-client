@@ -1,14 +1,46 @@
-:root {
-    --color-primary: #242323;       /* основной цвет */
-    --color-secondary: #EDEDED;     /* вторичный */
-    --color-success: #198754;       /* успех */
-    --color-danger: #FF0000;        /* ошибка */
-    --color-warning: #FFB547;       /* предупреждение */
-    --color-info: #0dcaf0;          /* инфо */
-    --color-light: #FAFAFA;         /* светлый фон */
-    --color-dark: #212529;
+/* globals.css */
 
-    --bg-main: #ffffff;             /* основной фон */
-    --text-main: #242323;           /* основной текст */
+:root {
+    /* твои переменные */
+    --primary: #242323;
+    --secondary: #EDEDED;
+    --success: #198754;
+    --danger: #FF0000;
+    --warning: #FFB547;
+    --info: #0dcaf0;
+    --light: #FAFAFA;
+    --dark: #212529;
+
+    --bg-main: #ffffff;
+    --text-main: #242323;
 }
 
+:root {
+    --bs-primary: var(--primary);
+    --bs-primary-rgb: 36, 35, 35;
+
+    --bs-secondary: var(--secondary);
+    --bs-secondary-rgb: 237, 237, 237;
+
+    --bs-success: var(--success);
+    --bs-success-rgb: 25, 135, 84;
+
+    --bs-danger: var(--danger);
+    --bs-danger-rgb: 255, 0, 0;
+
+    --bs-warning: var(--warning);
+    --bs-warning-rgb: 255, 181, 71;
+
+    --bs-info: var(--info);
+    --bs-info-rgb: 13, 202, 240;
+
+    /* при желании: тело/текст */
+    --bs-body-bg: var(--bg-main);
+    --bs-body-color: var(--text-main);
+}
+
+
+/* Резерв — если что-то ещё перебивает */
+.text-primary { color: var(--primary) !important; }
+.bg-primary { background-color: var(--primary) !important; }
+.border-primary { border-color: var(--primary) !important; }
