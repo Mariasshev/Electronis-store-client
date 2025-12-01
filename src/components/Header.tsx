@@ -1,6 +1,7 @@
 "use client";
 import Link from "next/link";
 import Image from "next/image";
+import logo from "../images/logo.svg";
 
 import styles from "../styles/Header.module.css";
 
@@ -11,8 +12,7 @@ export default function Header() {
 
             {/* Logo */}
             <div className="col-auto d-flex align-items-center">
-                {/*<img src="/logo.png" alt="logo" height="28" />*/}
-                <span className="fw-bold fs-4 ms-2 text-primary">Cyber</span>
+                <Image src={logo} alt="logo" height="28" />
             </div>
 
             {/* Search */}
