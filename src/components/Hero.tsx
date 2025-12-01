@@ -9,7 +9,7 @@ export default function Hero() {
                 <div className={styles.content}>
                     <p className={styles.subtitle}>Pro.Beyond.</p>
                     <h1 className={styles.title}>
-                        IPhone 14 <strong>Pro</strong>
+                        IPhone 14 <strong className="fw-bold">Pro</strong>
                     </h1>
                     <p className={styles.description}>
                         Created to change everything for the better. For everyone

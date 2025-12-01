@@ -80,8 +80,8 @@ export default function Header() {
 
             {/* SUBMENU – for desktop only */}
             <div className="bg-dark text-white d-none d-md-block">
-                <div className="container">
-                    <div className="row py-3">
+                <div className="container-lg">
+                    <div className="row py-3 d-flex justify-content-between">
                         <div className="col-auto d-flex align-items-center gap-2">
                             <i className="bi bi-phone"></i> <a href="#" className="text-white text-decoration-none">Phones</a>
                         </div>
