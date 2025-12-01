@@ -1,6 +1,7 @@
 "use client";
 
 import BootstrapProvider from "../components/BootstrapProvider";
+import Hero from "../components/Hero";
 import BrowseCategories from "../components/BrowseCategories";
 
 export default function Home() {
@@ -8,6 +9,7 @@ export default function Home() {
         <BootstrapProvider>
 
             <main>
+                <Hero />
                 <BrowseCategories />
             </main>
 
