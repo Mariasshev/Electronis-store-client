@@ -32,7 +32,7 @@ export default function Header() {
             {/* Navigation */}
             <div className="col-auto d-none d-lg-flex gap-3">
                 <a href="#" className="nav-link text-dark">Home</a>
-                <a href="#" className="nav-link text-dark">About</a>
+                <a href="#" className="nav-link text-dark">Catalog</a>
                 <a href="#" className="nav-link text-dark">Contact Us</a>
                 <a href="#" className="nav-link text-dark">Blog</a>
             </div>
