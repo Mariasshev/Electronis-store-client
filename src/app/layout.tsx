@@ -5,6 +5,7 @@ import './globals.css';
 
 import Header from '../components/Header';
 import Footer from '../components/Footer';
+
 import BootstrapProvider from '../components/BootstrapProvider';
 
 export const metadata = {

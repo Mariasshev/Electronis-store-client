@@ -1,0 +1,69 @@
+
+.section {
+    padding: 40px 0;
+    background: #fff;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+}
+
+.arrows {
+    display: flex;
+    gap: 10px;
+}
+
+.arrowBtn {
+    border: none;
+    background: #f4f4f4;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    font-size: 18px;
+    cursor: pointer;
+    transition: 0.2s ease;
+    color: #333;
+}
+
+.arrowBtn:hover {
+    background: #e0e0e0;
+}
+
+
+
+/* скрываем дефолтные стрелки Swiper */
+.swiper-button-prev::after,
+.swiper-button-next::after {
+    display: none;
+}
+
+.card {
+    height: 110px;
+    background: #f4f4f4;
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.card:hover {
+    background: #e9e9e9;
+}
+.h{
+    color: #333;
+}
+
+.icon {
+    font-size: 24px;
+    color: #333;
+}
+.category{
+    color: #333;
+}

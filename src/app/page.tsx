@@ -1,17 +1,17 @@
+"use client";
+
+import BootstrapProvider from "../components/BootstrapProvider";
+import BrowseCategories from "../components/BrowseCategories";
+
 export default function Home() {
     return (
-        <main>
-            <h1>Главная страница</h1>
-            <p>Это твоя стартовая страница React-приложения.</p>
+        <BootstrapProvider>
 
-            <section>
-                <h2>Разделы сайта:</h2>
-                <ul>
-                    <li>Каталог</li>
-                    <li>Блог</li>
-                    <li>Личный кабинет</li>
-                </ul>
-            </section>
-        </main>
+            <main>
+                <BrowseCategories />
+            </main>
+
+
+        </BootstrapProvider>
     );
 }
