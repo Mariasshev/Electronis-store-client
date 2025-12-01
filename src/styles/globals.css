@@ -34,13 +34,11 @@
     --bs-info: var(--info);
     --bs-info-rgb: 13, 202, 240;
 
-    /* при желании: тело/текст */
-    --bs-body-bg: var(--bg-main);
+    /*--bs-body-bg: var(--bg-main);*/
     --bs-body-color: var(--text-main);
 }
 
 
-/* Резерв — если что-то ещё перебивает */
 .text-primary { color: var(--primary) !important; }
 .bg-primary { background-color: var(--primary) !important; }
 .border-primary { border-color: var(--primary) !important; }
@@ -52,6 +50,7 @@ html, body {
     display: flex;
     flex-direction: column;
     min-height: 100vh;
+    background-color: white!important;
 }
 
 main {

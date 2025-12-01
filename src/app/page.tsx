@@ -1,6 +1,6 @@
 export default function Home() {
     return (
-        <main style={{ padding: "20px" }}>
+        <main>
             <h1>Главная страница</h1>
             <p>Это твоя стартовая страница React-приложения.</p>
 
