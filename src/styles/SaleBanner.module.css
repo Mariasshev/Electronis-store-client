@@ -1,0 +1,100 @@
+.section {
+  background: #fff;
+  padding: 24px 0;
+}
+
+@media (min-width: 992px) {
+  .section { padding: 40px 0; }
+}
+
+/* Широкий блок ~1440 */
+.wrap {
+  max-width: 2160px;
+}
+
+/* Баннер с фоновой картинкой */
+.banner {
+  position: relative;
+  overflow: hidden;
+  border-radius: 0;
+  min-height: 220px;
+
+  background-image: url("/img/banner/big-summer-sale.png");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+@media (min-width: 768px) {
+  .banner { min-height: 280px; }
+}
+
+@media (min-width: 992px) {
+  .banner { min-height: 340px; }
+}
+
+@media (min-width: 1200px) {
+  .banner { min-height: 380px; }
+}
+
+/* Оверлей для читабельности текста */
+.overlay {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(60% 80% at 50% 50%, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.55) 70%, rgba(0,0,0,0.75) 100%);
+  z-index: 1;
+}
+
+/* Контент */
+.content {
+  position: relative;
+  z-index: 2;
+  min-height: inherit;
+  display: flex;
+  flex-direction: column;
+  align-items: center;   /* по центру как на макете */
+  justify-content: center;
+  text-align: center;
+  padding: 28px 16px;
+}
+
+.title {
+  margin: 0;
+  line-height: 1;
+}
+
+.titleLight {
+  font-weight: 300;
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 38px;
+}
+
+.titleBold {
+  font-weight: 700;
+  color: #fff;
+  font-size: 38px;
+}
+
+@media (min-width: 992px) {
+  .titleLight, .titleBold { font-size: 64px; }
+}
+
+.subtitle {
+  margin: 10px 0 0;
+  color: rgba(255, 255, 255, 0.45);
+  font-size: 14px;
+  max-width: 520px;
+}
+
+.btn {
+  margin-top: 22px;
+  height: 48px;
+  padding: 0 34px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  background: transparent;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 500;
+}
