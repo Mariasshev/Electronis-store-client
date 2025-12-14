@@ -7,13 +7,12 @@
   .section { padding: 48px 0; }
 }
 
-/* Делаем блок шире, чем стандартный container-xxl (1320),
-   но всё равно по центру и безопасно на мобилке */
+/* 1440 по центру */
 .bannerWrap {
   max-width: 1440px;
 }
 
-/* Карточки */
+/* CARD */
 .card {
   position: relative;
   min-height: 320px;
@@ -23,12 +22,11 @@
   justify-content: flex-end;
 }
 
-/* Фоны */
 .cardGray { background: #f3f3f3; }
 .cardWhite { background: #ffffff; }
 .cardDark { background: #2b2b2b; color: #fff; }
 
-/* Зона под картинку */
+/* IMAGE AREA */
 .media {
   position: absolute;
   top: 22px;
@@ -37,11 +35,9 @@
   height: 155px;
 }
 
-.img {
-  object-fit: contain;
-}
+.img { object-fit: contain; }
 
-/* Контент */
+/* CONTENT */
 .content {
   position: relative;
   z-index: 1;
@@ -74,7 +70,34 @@
   width: fit-content;
 }
 
-/* Dark overrides */
+/* DARK OVERRIDES */
 .titleDark { color: #fff; }
 .textDark { color: rgba(255, 255, 255, 0.7); }
-.btnDark { border-color: rgba(255, 255, 255, 0.65); color: #fff; }
+.btnDark { border-color: rgba(255,255,255,0.65); color: #fff; }
+
+/* ===== CAROUSEL (mobile) ===== */
+.carousel :global(.carousel-control-prev),
+.carousel :global(.carousel-control-next) {
+  display: none; /* как в макете — без стрелок */
+}
+
+.slidePad {
+  padding: 0 12px; /* чтобы карточка не прилипала к краям экрана */
+}
+
+/* индикаторы (точки) */
+.indicators {
+  margin-bottom: -8px; /* чуть ниже карточки */
+}
+
+.carousel :global(.carousel-indicators button) {
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  border: 0;
+}
+
+.carousel :global(.carousel-indicators .active) {
+  width: 6px;
+  height: 6px;
+}
