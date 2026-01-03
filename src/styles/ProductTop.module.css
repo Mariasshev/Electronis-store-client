@@ -1,0 +1,225 @@
+.section { padding-top: 8px; }
+
+/* ===== Gallery ===== */
+.gallery {
+  display: grid;
+  grid-template-columns: 88px 1fr;
+  gap: 18px;
+  align-items: center;
+}
+
+.thumbs {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  align-items: center;
+}
+
+.thumb {
+  width: 72px;
+  height: 88px;
+  border-radius: 10px;
+  border: 1px solid #e6e6e6;
+  background: #f3f3f3;
+  display: grid;
+  place-items: center;
+  padding: 6px;
+  cursor: pointer;
+}
+
+.thumbActive { background: #fff; border-color: #111; }
+
+.mainImage { position: relative; width: 100%; min-height: 520px; }
+.mainImg { object-fit: contain; }
+
+@media (max-width: 991.98px) {
+  .gallery { grid-template-columns: 1fr; }
+  .thumbs { flex-direction: row; justify-content: space-between; gap: 10px; order: 2; }
+  .thumb { width: 64px; height: 78px; }
+  .mainImage { min-height: 360px; order: 1; }
+}
+
+/* ===== Info ===== */
+.info { padding-top: 6px; }
+
+.title {
+  font-size: 34px;
+  line-height: 1.1;
+  font-weight: 600;
+  margin: 0 0 12px;
+  color: #111;
+}
+
+.priceRow { display: flex; gap: 14px; align-items: baseline; margin-bottom: 14px; }
+.price { font-size: 24px; font-weight: 600; color: #111; }
+.oldPrice { font-size: 18px; color: #b0b0b0; text-decoration: line-through; }
+
+/* ===== Colors ===== */
+.colorsRow { display: flex; gap: 14px; align-items: center; margin-bottom: 14px; }
+.label { font-size: 12px; color: #111; }
+.colors { display: flex; gap: 10px; }
+
+/* кружок */
+.colorDot {
+  width: 18px !important;
+  height: 18px !important;
+  min-width: 18px;
+  border-radius: 999px;
+
+  padding: 0 !important;
+  line-height: 0;
+  display: inline-block;
+
+  background: var(--dot, #000) !important;
+  border: 1px solid rgba(0,0,0,0.12);
+
+  cursor: pointer;
+  outline: none;
+  appearance: none;
+  -webkit-appearance: none;
+  position: relative;
+}
+
+/* активное “кольцо” + белая обводка + лёгкое свечение (чтобы видно было на тёмном фоне) */
+.dotActive::after {
+  content: "";
+  position: absolute;
+  inset: -4px;
+  border-radius: 999px;
+  border: 2px solid #111;
+  box-shadow: 0 0 0 2px #fff; /* белое кольцо как в макете */
+}
+
+.colorDot:focus-visible::after {
+  content: "";
+  position: absolute;
+  inset: -5px;
+  border-radius: 999px;
+  border: 2px solid #111;
+  box-shadow: 0 0 0 3px rgba(17, 17, 17, 0.15), 0 0 0 2px #fff;
+}
+
+.dotBlack { --dot: #111; }
+.dotPurple { --dot: #6f2dbd; }
+.dotRed { --dot: #d61c1c; }
+.dotYellow { --dot: #f4b400; }
+.dotGray { --dot: #d9d9d9; }
+
+/* ===== Memory ===== */
+.memory {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.memBtn {
+  height: 44px;
+  border-radius: 10px;
+  border: 1px solid #e3e3e3;
+  background: #fff;
+  font-size: 12px;
+  color: #444;
+  cursor: pointer;
+}
+
+.memBtn:disabled { color: #bcbcbc; background: #fbfbfb; cursor: not-allowed; }
+
+.memActive { border-color: #111; color: #111; font-weight: 600; }
+
+/* ===== Specs ===== */
+.specs {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.spec {
+  background: #f3f3f3;
+  border-radius: 10px;
+  padding: 12px;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  min-height: 58px;
+}
+
+.specIcon { width: 16px; height: 16px; color: #111; opacity: 0.7; display: grid; place-items: center; }
+.specIcon :global(svg) { width: 16px; height: 16px; }
+
+.specKey { font-size: 10px; color: #9a9a9a; line-height: 1.1; }
+.specVal { font-size: 11px; color: #111; font-weight: 600; line-height: 1.2; }
+
+/* ===== Desc ===== */
+.desc { font-size: 12px; color: #6e6e6e; line-height: 1.45; margin: 0 0 18px; }
+.moreBtnLink {
+  border: 0;
+  background: transparent;
+  padding: 0;
+  margin-left: 6px;
+  cursor: pointer;
+  color: #111;
+  font-weight: 600;
+  font-size: 12px;
+}
+
+/* ===== Actions ===== */
+.actions { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 18px; }
+
+.wishBtn {
+  height: 48px;
+  border-radius: 10px;
+  border: 1px solid #111;
+  background: #fff;
+  color: #111;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.wishActive { background: #111; color: #fff; }
+
+.cartBtn {
+  height: 48px;
+  border-radius: 10px;
+  border: 0;
+  background: #111;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.cartActive { background: #2a2a2a; }
+
+/* ===== Benefits ===== */
+.benefits { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+
+.benefit {
+  background: #f3f3f3;
+  border-radius: 12px;
+  padding: 12px;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.benefitIcon {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: #efefef;
+  display: grid;
+  place-items: center;
+}
+
+.benefitIcon :global(svg) { width: 16px; height: 16px; opacity: 0.8; }
+.benefitTop { font-size: 10px; color: #9a9a9a; }
+.benefitBottom { font-size: 12px; color: #111; font-weight: 700; }
+
+/* ===== Mobile ===== */
+@media (max-width: 575.98px) {
+  .title { font-size: 30px; }
+  .memory { grid-template-columns: repeat(2, 1fr); }
+  .specs { grid-template-columns: repeat(2, 1fr); }
+  .actions { grid-template-columns: 1fr; }
+}
