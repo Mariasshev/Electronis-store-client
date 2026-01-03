@@ -29,12 +29,24 @@ export default function Header() {
                 </div>
             </div>
 
-            {/* Navigation */}
             <div className="col-auto d-none d-lg-flex gap-3">
-                <a href="#" className="nav-link text-dark">Home</a>
-                <a href="#" className="nav-link text-dark">Catalog</a>
-                <a href="#" className="nav-link text-dark">Contact Us</a>
-                <a href="#" className="nav-link text-dark">Blog</a>
+                {/* Ссылка на главную */}
+                <Link href="/" className="nav-link text-dark">
+                    Home
+                </Link>
+
+                {/* Ссылка на каталог */}
+                <Link href="/catalog" className="nav-link text-dark">
+                    Catalog
+                </Link>
+
+                {/* Остальные ссылки (пока можно оставить # или указать будущие пути) */}
+                <Link href="/contacts" className="nav-link text-dark">
+                    Contact Us
+                </Link>
+                <Link href="/blog" className="nav-link text-dark">
+                    Blog
+                </Link>
             </div>
 
             {/* Icons + Mobile Burger */}
