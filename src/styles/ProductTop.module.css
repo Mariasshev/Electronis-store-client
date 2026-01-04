@@ -197,3 +197,18 @@
   .specs { grid-template-columns: repeat(2, 1fr); }
   .actions { grid-template-columns: 1fr; }
 }
+
+.memoryChip {
+    border: 1px solid #ddd;
+    background-color: #fff;
+    color: #333;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-weight: 500;
+    font-size: 14px;
+    transition: all 0.2s ease;
+}
+
+.memoryChip:hover {
+    border-color: #999;
+}
