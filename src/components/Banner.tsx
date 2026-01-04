@@ -50,8 +50,7 @@ export default function Banner() {
 
   return (
     <section className={styles.section}>
-      <div className={`container-xxl ${styles.bannerWrap}`}>
-        {/* ✅ DESKTOP (lg+) — grid 4 in row */}
+      <div className={`container-lg ${styles.bannerWrap}`}>
         <div className="d-none d-sm-block">
           <div className="row g-0">
             <div className="col-lg-3">

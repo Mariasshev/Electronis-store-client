@@ -1,27 +1,42 @@
 "use client";
 
+import Link from "next/link";
 import styles from "../../styles/Breadcrumbs.module.css";
 
-export default function Breadcrumbs() {
-  return (
-    <nav aria-label="breadcrumb" className={styles.wrap}>
-      <ol className="breadcrumb mb-0">
-        <li className="breadcrumb-item">
-          <a href="#" className={styles.link}>Home</a>
-        </li>
-        <li className="breadcrumb-item">
-          <a href="#" className={styles.link}>Catalog</a>
-        </li>
-        <li className="breadcrumb-item">
-          <a href="#" className={styles.link}>Smartphones</a>
-        </li>
-        <li className="breadcrumb-item">
-          <a href="#" className={styles.link}>Apple</a>
-        </li>
-        <li className={`breadcrumb-item active ${styles.active}`}>
-          iPhone 14 Pro Max
-        </li>
-      </ol>
-    </nav>
-  );
+// Описуємо структуру одного елемента хлібних крихт
+export interface BreadcrumbItem {
+    label: string;
+    href?: string;
+}
+
+interface BreadcrumbsProps {
+    items: BreadcrumbItem[];
+}
+
+export default function Breadcrumbs({ items }: BreadcrumbsProps) {
+    return (
+        <nav aria-label="breadcrumb" className={styles.wrap}>
+            <ol className="breadcrumb mb-0">
+                {items.map((item, index) => {
+                    const isLast = index === items.length - 1;
+
+                    return (
+                        <li
+                            key={index}
+                            className={`breadcrumb-item ${isLast ? `active ${styles.active}` : ""}`}
+                            aria-current={isLast ? "page" : undefined}
+                        >
+                            {isLast ? (
+                                item.label
+                            ) : (
+                                <Link href={item.href || "#"} className={styles.link}>
+                                    {item.label}
+                                </Link>
+                            )}
+                        </li>
+                    );
+                })}
+            </ol>
+        </nav>
+    );
 }

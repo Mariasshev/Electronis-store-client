@@ -9,7 +9,7 @@ import RelatedProducts from "./RelatedProducts";
 export default function ProductPage() {
   return (
       <div style={{ background: "#fff", color: "#111", minHeight: "100vh" }}>
-    <div className="container py-4 py-lg-5">
+    <div className="container-lg py-4 py-lg-5">
       <Breadcrumbs />
 
       <ProductTop />

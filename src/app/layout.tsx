@@ -10,8 +10,8 @@ export const metadata = { title: "Cyber" };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-      <html lang="en" data-bs-theme="light">
-      <body>
+      <html lang="en" suppressHydrationWarning={true}>
+      <body suppressHydrationWarning>
         <BootstrapProvider>
           <Header />
           <main>{children}</main>

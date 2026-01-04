@@ -12,7 +12,7 @@ export default function ProductsTabs() {
 
   return (
     <section className={styles.section}>
-      <div className="container py-5">
+      <div className="container-lg py-5">
         {/* Tabs */}
         <div className={styles.tabs}>
           <button
