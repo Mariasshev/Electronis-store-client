@@ -1,29 +1,56 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link"; // 1. Імпортуємо Link
+import Link from "next/link";
 import { FiHeart } from "react-icons/fi";
+import { FaHeart } from "react-icons/fa";
+import { useWishlist } from "@/context/WishlistContext";
 import styles from "../styles/DiscountSection.module.css";
+import toast from "react-hot-toast";
 
 interface ProductCardProps {
-    id: number; // 2. Додаємо ID, щоб знати, куди переходити
+    id: number;
     title: string;
     price: string | number;
     image: string;
 }
 
 export default function ProductCard({ id, title, price, image }: ProductCardProps) {
+    // Беремо функції з глобального контексту
+    const { isInWishlist, addToWishlist, removeFromWishlist } = useWishlist();
+
+    // Перевіряємо, чи цей конкретний товар є в списку улюблених
+    const isWishlisted = isInWishlist(id);
     const imageUrl = image || '/img/placeholder.png';
-    // Формуємо посилання: /catalog/6, /catalog/7 і т.д.
     const productUrl = `/catalog/${id}`;
+
+    const handleWishlistClick = (e: React.MouseEvent) => {
+        e.preventDefault();
+        if (isWishlisted) {
+            removeFromWishlist(id);
+        } else {
+            addToWishlist(id);
+        }
+    };
 
     return (
         <div className={styles.card}>
-            <button className={styles.favBtn} type="button" aria-label="Add to favorites">
-                <FiHeart />
+            <button
+                className={styles.favBtn}
+                type="button"
+                onClick={handleWishlistClick}
+                style={{
+                    color: isWishlisted ? "#ff0000" : "inherit",
+                    border: "none",
+                    background: "transparent",
+                    cursor: "pointer",
+                    fontSize: "1.2rem",
+                    zIndex: 10
+                }}
+            >
+                {isWishlisted ? <FaHeart /> : <FiHeart />}
             </button>
 
-            {/* 3. Обгортаємо картинку в Link */}
             <Link href={productUrl} className={styles.imgWrap} style={{ position: 'relative', height: '200px', display: 'block' }}>
                 <Image
                     src={imageUrl}
@@ -36,13 +63,19 @@ export default function ProductCard({ id, title, price, image }: ProductCardProp
             </Link>
 
             <div className={styles.body}>
-                {/* 4. Обгортаємо назву в Link (щоб по тексту теж можна було клікнути) */}
                 <Link href={productUrl} style={{ textDecoration: 'none', color: 'inherit' }}>
                     <div className={styles.name}>{title}</div>
                 </Link>
 
                 <div className={styles.price}>${price}</div>
-                <button className={styles.buyBtn} type="button">Buy Now</button>
+
+                <button
+                    className={styles.buyBtn}
+                    type="button"
+                    onClick={() => toast.success("Added to Cart (Demo)")}
+                >
+                    Buy Now
+                </button>
             </div>
         </div>
     );

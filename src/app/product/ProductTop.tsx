@@ -1,8 +1,10 @@
 "use client";
 
 import Image from "next/image";
-import { useState } from "react"; // Прибираємо useEffect, він тут не потрібен
+import { useState } from "react";
 import { FiCheckCircle, FiXCircle, FiTruck, FiHome, FiHeart } from "react-icons/fi";
+import { FaHeart } from "react-icons/fa"; // Зафарбоване серце
+import { useWishlist } from "@/context/WishlistContext"; // Наш хук
 import styles from "../../styles/ProductTop.module.css";
 
 interface ProductMemory {
@@ -38,22 +40,33 @@ interface ProductTopProps {
 
 export default function ProductTop({ product }: ProductTopProps) {
 
-    console.log("PRODUCT DATA FROM SERVER:", product);
-    console.log("MEMORY OPTIONS:", product?.memoryOptions);
+    // 1. ПІДКЛЮЧАЄМО КОНТЕКСТ ВІШЛИСТА
+    const { isInWishlist, addToWishlist, removeFromWishlist } = useWishlist();
 
     const [activeImgIndex, setActiveImgIndex] = useState(0);
-    const [wish, setWish] = useState(false);
     const [inCart, setInCart] = useState(false);
 
     // Стейт для РУЧНОГО вибору користувача
     const [userSelectedColor, setUserSelectedColor] = useState<ProductColor | null>(null);
     const [userSelectedMemory, setUserSelectedMemory] = useState<ProductMemory | null>(null);
 
+    // 2. БЕРЕМО ID З ПРОДУКТУ (params тут недоступні)
+    const productId = product?.id || 0;
+    const isWishlisted = isInWishlist(productId);
+
+    // 3. ОБРОБНИК КЛІКУ ПО СЕРЦЮ
+    const handleWishlistClick = () => {
+        if (!product) return;
+        if (isWishlisted) {
+            removeFromWishlist(productId);
+        } else {
+            addToWishlist(productId);
+        }
+    };
+
     if (!product) return <div className="py-5 text-center">Loading...</div>;
 
-    // --- ЛОГІКА "DERIVED STATE" (ВИРІШЕННЯ ПОМИЛКИ) ---
-    // Якщо користувач вибрав - беремо його вибір.
-    // Якщо ні - беремо перший елемент із масиву (дефолтний).
+    // --- ЛОГІКА "DERIVED STATE" ---
     const activeColor = userSelectedColor || (product.colors && product.colors.length > 0 ? product.colors[0] : null);
     const activeMemory = userSelectedMemory || (product.memoryOptions && product.memoryOptions.length > 0 ? product.memoryOptions[0] : null);
 
@@ -77,11 +90,9 @@ export default function ProductTop({ product }: ProductTopProps) {
     // --- ЛОГІКА ЦІНИ ---
     const finalPrice = product.price + (activeMemory?.priceModifier || 0);
 
-
     return (
         <section className={styles.section}>
             <div className="row g-4 align-items-start">
-
 
                 {/* ГАЛЕРЕЯ */}
                 <div className="col-12 col-lg-6">
@@ -147,7 +158,6 @@ export default function ProductTop({ product }: ProductTopProps) {
                                                     position: 'relative', padding: 0,
                                                     boxShadow: isActive ? '0 0 0 2px #fff inset' : 'none'
                                                 }}
-                                                // ТУТ ОНОВЛЮЄМО СТЕЙТ КОРИСТУВАЧА
                                                 onClick={() => setUserSelectedColor(c)}
                                                 title={`${c.name} (${c.quantity} available)`}
                                             >
@@ -175,7 +185,6 @@ export default function ProductTop({ product }: ProductTopProps) {
                                 </div>
                                 <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
                                     {product.memoryOptions.map((mem) => {
-                                        // Порівнюємо по size
                                         const isActive = activeMemory?.size === mem.size;
                                         const isOutOfStock = mem.quantity === 0;
 
@@ -195,7 +204,6 @@ export default function ProductTop({ product }: ProductTopProps) {
                                                     cursor: isOutOfStock ? 'not-allowed' : 'pointer',
                                                     transition: 'all 0.2s ease'
                                                 }}
-                                                // ТУТ ОНОВЛЮЄМО СТЕЙТ КОРИСТУВАЧА
                                                 onClick={() => setUserSelectedMemory(mem)}
                                                 disabled={isOutOfStock}
                                             >
@@ -224,10 +232,17 @@ export default function ProductTop({ product }: ProductTopProps) {
                         {/* ДІЇ */}
                         <div className={styles.actions}>
                             <button
-                                className={`${styles.wishBtn} ${wish ? styles.wishActive : ""}`}
-                                onClick={() => setWish(!wish)}
+                                // Додаємо клас active, якщо товар у вішлисті
+                                className={`${styles.wishBtn} ${isWishlisted ? styles.wishActive : ""}`}
+                                onClick={handleWishlistClick}
+                                style={{
+                                    // Додатково можна підфарбувати іконку червоним
+                                    color: isWishlisted ? "#ff0000" : "inherit",
+                                    borderColor: isWishlisted ? "#ff0000" : ""
+                                }}
                             >
-                                <FiHeart />
+                                {/* Міняємо іконку: повна або пуста */}
+                                {isWishlisted ? <FaHeart /> : <FiHeart />}
                             </button>
 
                             <button
@@ -252,8 +267,8 @@ export default function ProductTop({ product }: ProductTopProps) {
                                     <div className={styles.benefitTop}>Availability</div>
                                     <div className={styles.benefitBottom}>
                                         {isAvailable
-                                            ? <span className="text-success d-flex align-items-center gap-1"><FiCheckCircle/> In Stock ({currentStock})</span>
-                                            : <span className="text-danger d-flex align-items-center gap-1"><FiXCircle/> Out of Stock</span>}
+                                            ? <span className="text-success d-flex align-items-center gap-1"><FiCheckCircle /> In Stock ({currentStock})</span>
+                                            : <span className="text-danger d-flex align-items-center gap-1"><FiXCircle /> Out of Stock</span>}
                                     </div>
                                 </div>
                             </div>

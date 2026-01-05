@@ -114,7 +114,7 @@ export default function RegisterPage() {
 
                 <div className="mt-4 text-center">
                     <p className="text-muted" style={{ fontSize: "0.95rem" }}>
-                        Already have an account?{" "}
+                        Already have an account?{"  "}
                         <Link href="/auth/login" className="text-dark fw-bold text-decoration-none">Log in</Link>
                     </p>
                 </div>
