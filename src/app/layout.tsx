@@ -9,6 +9,7 @@ import Footer from "../components/Footer";
 import { AuthProvider } from "@/context/AuthContext";
 import { WishlistProvider } from "@/context/WishlistContext";
 import { CartProvider } from "@/context/CartContext";
+import CurrencyTicker from "@/components/CurrencyTicker";
 
 export const metadata = { title: "Cyber" };
 
@@ -24,6 +25,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                   <main>{children}</main>
                     <Toaster position="bottom-right" reverseOrder={false} />
                   <Footer />
+                    <CurrencyTicker />
                 </BootstrapProvider>
               </CartProvider>
           </WishlistProvider>

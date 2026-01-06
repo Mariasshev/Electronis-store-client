@@ -2,11 +2,13 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation"; // Для переходу в корзину
 import { FiHeart } from "react-icons/fi";
 import { FaHeart } from "react-icons/fa";
 import { useWishlist } from "@/context/WishlistContext";
+import { useCart } from "@/context/CartContext"; // 1. Імпортуємо CartContext
 import styles from "../styles/DiscountSection.module.css";
-import toast from "react-hot-toast";
+// import toast from "react-hot-toast"; // Тости вже є всередині CartContext, тут можна прибрати
 
 interface ProductCardProps {
     id: number;
@@ -16,14 +18,20 @@ interface ProductCardProps {
 }
 
 export default function ProductCard({ id, title, price, image }: ProductCardProps) {
-    // Беремо функції з глобального контексту
-    const { isInWishlist, addToWishlist, removeFromWishlist } = useWishlist();
+    const router = useRouter();
 
-    // Перевіряємо, чи цей конкретний товар є в списку улюблених
+    // --- WISHLIST ---
+    const { isInWishlist, addToWishlist, removeFromWishlist } = useWishlist();
     const isWishlisted = isInWishlist(id);
+
+    // --- CART (НОВЕ) ---
+    const { addToCart, isInCart } = useCart();
+    const isAddedToCart = isInCart(id); // Перевіряємо, чи товар вже куплений
+
     const imageUrl = image || '/img/placeholder.png';
     const productUrl = `/catalog/${id}`;
 
+    // Обробник лайка
     const handleWishlistClick = (e: React.MouseEvent) => {
         e.preventDefault();
         if (isWishlisted) {
@@ -33,8 +41,22 @@ export default function ProductCard({ id, title, price, image }: ProductCardProp
         }
     };
 
+    // Обробник кошика (НОВЕ)
+    const handleCartClick = (e: React.MouseEvent) => {
+        e.preventDefault(); // Щоб не переходило на сторінку товару
+
+        if (isAddedToCart) {
+            // Якщо вже в кошику — йдемо в кошик
+            router.push('/cart');
+        } else {
+            // Якщо ні — додаємо
+            addToCart(id);
+        }
+    };
+
     return (
         <div className={styles.card}>
+            {/* Wishlist Button */}
             <button
                 className={styles.favBtn}
                 type="button"
@@ -51,6 +73,7 @@ export default function ProductCard({ id, title, price, image }: ProductCardProp
                 {isWishlisted ? <FaHeart /> : <FiHeart />}
             </button>
 
+            {/* Image Link */}
             <Link href={productUrl} className={styles.imgWrap} style={{ position: 'relative', height: '200px', display: 'block' }}>
                 <Image
                     src={imageUrl}
@@ -69,12 +92,20 @@ export default function ProductCard({ id, title, price, image }: ProductCardProp
 
                 <div className={styles.price}>${price}</div>
 
+                {/* Cart Button (ОНОВЛЕНО) */}
                 <button
                     className={styles.buyBtn}
                     type="button"
-                    onClick={() => toast.success("Added to Cart ")}
+                    onClick={handleCartClick}
+                    style={{
+                        // Змінюємо стиль, якщо товар в кошику
+                        backgroundColor: isAddedToCart ? "#fff" : "#111",
+                        color: isAddedToCart ? "#111" : "#fff",
+                        border: isAddedToCart ? "1px solid #111" : "none",
+                        transition: "all 0.2s"
+                    }}
                 >
-                    Buy Now
+                    {isAddedToCart ? "In Cart" : "Buy Now"}
                 </button>
             </div>
         </div>

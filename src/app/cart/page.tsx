@@ -4,9 +4,10 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
-import { useCart } from "@/context/CartContext"; // Щоб оновлювати бейдж в хедері
+import { useCart } from "@/context/CartContext";
 import { FiX, FiMinus, FiPlus } from "react-icons/fi";
 import toast from "react-hot-toast";
+import { useRouter } from "next/navigation";
 
 // Типи даних
 interface CartProduct {
@@ -24,10 +25,39 @@ interface CartItem {
 
 export default function CartPage() {
     const { user } = useAuth();
+    const router = useRouter();
     const { addToCart, removeFromCart: contextRemove } = useCart(); // Методи контексту
 
     const [items, setItems] = useState<CartItem[]>([]);
     const [isLoading, setIsLoading] = useState(true);
+
+    const [promoCode, setPromoCode] = useState("");
+    const [discountPercent, setDiscountPercent] = useState(0);
+    const [isCheckingPromo, setIsCheckingPromo] = useState(false);
+
+    const checkPromoCode = async () => {
+        if (!promoCode.trim()) return;
+        setIsCheckingPromo(true);
+        try {
+            const res = await fetch("http://localhost:8080/api/promo", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ code: promoCode })
+            });
+            const data = await res.json();
+            if (data.valid) {
+                setDiscountPercent(data.discountPercent);
+                toast.success(`Code applied! -${data.discountPercent}%`);
+            } else {
+                setDiscountPercent(0);
+                toast.error("Invalid code");
+            }
+        } catch (e) {
+            console.error(e);
+        } finally {
+            setIsCheckingPromo(false);
+        }
+    };
 
     // --- ЗАВАНТАЖЕННЯ КОРЗИНИ ---
     useEffect(() => {
@@ -81,9 +111,10 @@ export default function CartPage() {
 
     // --- РОЗРАХУНКИ (Summary) ---
     const subtotal = items.reduce((acc, item) => acc + (item.product.price * item.quantity), 0);
-    const tax = 50; // Фіксований податок як на макеті
-    const shipping = 29; // Фіксована доставка
-    const total = subtotal + tax + shipping;
+    const discountAmount = (subtotal * discountPercent) / 100; // Сума знижки
+    const tax = 50;
+    const shipping = 29;
+    const total = subtotal - discountAmount + tax + shipping;
 
     if (!user) return <div className="text-center py-5">Please Log In to view cart</div>;
     if (isLoading) return <div className="text-center py-5">Loading cart...</div>;
@@ -91,7 +122,7 @@ export default function CartPage() {
     return (
         <div className="bg-white min-vh-100 py-5">
             <div className="container" style={{ maxWidth: "1100px" }}>
-                <h1 className="fw-bold mb-5">Shopping Cart</h1>
+                <h2 className="fw-bold mb-5">Cart</h2>
 
                 <div className="row g-5">
                     {/* ЛІВА КОЛОНКА - ТОВАРИ */}
@@ -171,17 +202,24 @@ export default function CartPage() {
                             <div className="mb-3">
                                 <label className="form-label text-muted small">Discount code / Promo code</label>
                                 <div className="input-group">
-                                    <input type="text" className="form-control" placeholder="Code" />
+                                    <input
+                                        type="text"
+                                        className="form-control"
+                                        placeholder="Code"
+                                        value={promoCode}
+                                        onChange={(e) => setPromoCode(e.target.value)}
+                                    />
+                                    <button
+                                        className="btn btn-outline-dark"
+                                        onClick={checkPromoCode}
+                                        disabled={isCheckingPromo || discountPercent > 0}
+                                    >
+                                        {discountPercent > 0 ? "Applied" : "Apply"}
+                                    </button>
                                 </div>
+                                {discountPercent > 0 && <div className="text-success small mt-1">Discount applied: -${discountAmount.toFixed(2)}</div>}
                             </div>
 
-                            <div className="mb-4">
-                                <label className="form-label text-muted small">Your bonus card number</label>
-                                <div className="input-group">
-                                    <input type="text" className="form-control" placeholder="Enter Card Number" />
-                                    <button className="btn btn-outline-dark">Apply</button>
-                                </div>
-                            </div>
 
                             {/* Розрахунки */}
                             <div className="d-flex justify-content-between mb-2">
@@ -204,7 +242,7 @@ export default function CartPage() {
 
                             <button
                                 className="btn btn-dark w-100 py-3 fw-bold rounded-3"
-                                onClick={() => alert("Checkout flow coming soon!")}
+                                onClick={() => router.push(`/checkout?total=${total}`)} // Передаємо суму в чекаут
                                 disabled={items.length === 0}
                             >
                                 Checkout

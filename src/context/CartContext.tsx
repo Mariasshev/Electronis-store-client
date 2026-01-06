@@ -8,6 +8,7 @@ interface CartContextType {
     addToCart: (productId: number) => Promise<void>;
     removeFromCart: (productId: number) => Promise<void>;
     isInCart: (productId: number) => boolean;
+    clearCart: () => void;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -15,6 +16,9 @@ const CartContext = createContext<CartContextType | undefined>(undefined);
 export function CartProvider({ children }: { children: ReactNode }) {
     const { user } = useAuth();
     const [cartItems, setCartItems] = useState<number[]>([]);
+    const clearCart = () => {
+        setCartItems([]); // Очищаємо локальний стейт (бейдж зникне)
+    };
 
     useEffect(() => {
         if (user) {
@@ -70,7 +74,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
     const isInCart = (productId: number) => cartItems.includes(productId);
 
     return (
-        <CartContext.Provider value={{ cartItems, addToCart, removeFromCart, isInCart }}>
+        <CartContext.Provider value={{ cartItems, addToCart, removeFromCart, isInCart, clearCart }}>
             {children}
         </CartContext.Provider>
     );
