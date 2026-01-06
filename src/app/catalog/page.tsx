@@ -48,25 +48,23 @@ export default function CatalogPage() {
         const fetchProducts = async () => {
             setIsLoading(true);
             try {
-                let url = 'http://localhost:8080/api/products';
-                if (categoryId) {
-                    url += `?categoryId=${categoryId}`;
-                }
+                // Передаємо ВСІ параметри URL на сервер (categoryId, brand, spec_CPU...)
+                const queryString = searchParams.toString();
+                const url = `http://localhost:8080/api/products?${queryString}`;
 
                 const response = await fetch(url);
-                if (!response.ok) throw new Error('Ошибка сети');
-
+                if (!response.ok) throw new Error('Network error');
                 const data = await response.json();
                 setProducts(data);
             } catch (error) {
-                console.error("Не удалось загрузить товары:", error);
+                console.error("Error:", error);
             } finally {
                 setIsLoading(false);
             }
         };
 
         fetchProducts();
-    }, [categoryId]);
+    }, [searchParams]);
 
     return (
         <main className="container-lg py-4">
@@ -86,7 +84,7 @@ export default function CatalogPage() {
 
             <div className="row">
                 <aside className="col-lg-3 d-none d-lg-block">
-                    <FilterSidebar />
+                    <FilterSidebar categoryId={categoryId} />
                 </aside>
 
                 <div className="col-lg-9">

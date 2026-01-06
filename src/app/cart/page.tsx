@@ -1,259 +1,218 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import Image from "next/image";
-import { useMemo, useState } from "react";
+import Link from "next/link";
+import { useAuth } from "@/context/AuthContext";
+import { useCart } from "@/context/CartContext"; // Щоб оновлювати бейдж в хедері
+import { FiX, FiMinus, FiPlus } from "react-icons/fi";
+import toast from "react-hot-toast";
 
-type CartItem = {
-  id: number;
-  title: string;
-  sku: string;
-  price: number;
-  qty: number;
-  img: string;
-};
+// Типи даних
+interface CartProduct {
+    id: number;
+    name: string;
+    price: number;
+    imageUrl: string;
+}
+
+interface CartItem {
+    id: number; // ID запису в корзині
+    quantity: number;
+    product: CartProduct;
+}
 
 export default function CartPage() {
-  const initialItems: CartItem[] = useMemo(
-    () => [
-      {
-        id: 1,
-        title: "Apple iPhone 14 Pro Max 128GB Deep Purple",
-        sku: "#25139526913984",
-        price: 1399,
-        qty: 1,
-        img: "/img/product/main.png",
-      },
-      {
-        id: 2,
-        title: "AirPods Max Silver",
-        sku: "#53459358345",
-        price: 549,
-        qty: 1,
-        img: "/img/discount/AirPodsMax.png",
-      },
-      {
-        id: 3,
-        title: "Apple Watch Series 9 GPS 41mm Starlight Aluminium",
-        sku: "#63632324",
-        price: 399,
-        qty: 1,
-        img: "/img/discount/AppleWatchSeries9.png",
-      },
-    ],
-    []
-  );
+    const { user } = useAuth();
+    const { addToCart, removeFromCart: contextRemove } = useCart(); // Методи контексту
 
-  const [items, setItems] = useState<CartItem[]>(initialItems);
+    const [items, setItems] = useState<CartItem[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
 
-  const tax = 50;
-  const shipping = 29;
+    // --- ЗАВАНТАЖЕННЯ КОРЗИНИ ---
+    useEffect(() => {
+        if (user) {
+            fetch(`http://localhost:8080/api/cart?userId=${user.id}`)
+                .then(res => res.json())
+                .then(data => {
+                    setItems(data);
+                    setIsLoading(false);
+                })
+                .catch(err => {
+                    console.error(err);
+                    setIsLoading(false);
+                });
+        }
+    }, [user]);
 
-  const subtotal = items.reduce((sum, it) => sum + it.price * it.qty, 0);
-  const total = subtotal + (items.length ? tax + shipping : 0);
+    // --- ЗМІНА КІЛЬКОСТІ (+ / -) ---
+    const updateQuantity = async (productId: number, newQty: number) => {
+        if (newQty < 1) return;
 
-  const inc = (id: number) => setItems((p) => p.map((it) => (it.id === id ? { ...it, qty: it.qty + 1 } : it)));
-  const dec = (id: number) =>
-    setItems((p) =>
-      p.map((it) => (it.id === id ? { ...it, qty: Math.max(1, it.qty - 1) } : it))
-    );
-  const remove = (id: number) => setItems((p) => p.filter((it) => it.id !== id));
+        // 1. Оптимістичне оновлення інтерфейсу (щоб не чекати сервера)
+        setItems(prev => prev.map(item =>
+            item.product.id === productId ? { ...item, quantity: newQty } : item
+        ));
 
-  return (
-    <div style={{ background: "#fff", color: "#111", minHeight: "100vh" }}>
-      <div className="container py-4 py-lg-5">
-        <div className="row g-4">
-          {/* LEFT */}
-          <div className="col-12 col-lg-7">
-            <h1 className="h4 fw-semibold mb-3 mb-lg-4">Shopping Cart</h1>
+        // 2. Запит на сервер (PUT)
+        try {
+            await fetch("http://localhost:8080/api/cart", {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ userId: user?.id, productId, quantity: newQty }),
+            });
+            // Тут ми не кличемо toast, бо це заважає при швидкому кліканні
+        } catch (error) {
+            console.error("Failed to update qty");
+            toast.error("Error updating quantity");
+        }
+    };
 
-            <div className="d-flex flex-column">
-              {items.map((it, idx) => (
-                <div key={it.id} className={idx !== items.length - 1 ? "border-bottom pb-3 mb-3" : ""}>
-                  {/* Desktop row */}
-                  <div className="d-none d-md-flex align-items-center gap-3">
-                    <div style={{ width: 74, height: 74, position: "relative", flex: "0 0 auto" }}>
-                      <Image src={it.img} alt={it.title} fill style={{ objectFit: "contain" }} sizes="74px" />
+    // --- ВИДАЛЕННЯ ---
+    const handleRemove = async (productId: number) => {
+        if (!confirm("Remove this item?")) return;
+
+        // Видаляємо локально
+        setItems(prev => prev.filter(item => item.product.id !== productId));
+
+        // Видаляємо глобально (це оновить і хедер, і БД)
+        await contextRemove(productId);
+    };
+
+    // --- РОЗРАХУНКИ (Summary) ---
+    const subtotal = items.reduce((acc, item) => acc + (item.product.price * item.quantity), 0);
+    const tax = 50; // Фіксований податок як на макеті
+    const shipping = 29; // Фіксована доставка
+    const total = subtotal + tax + shipping;
+
+    if (!user) return <div className="text-center py-5">Please Log In to view cart</div>;
+    if (isLoading) return <div className="text-center py-5">Loading cart...</div>;
+
+    return (
+        <div className="bg-white min-vh-100 py-5">
+            <div className="container" style={{ maxWidth: "1100px" }}>
+                <h1 className="fw-bold mb-5">Shopping Cart</h1>
+
+                <div className="row g-5">
+                    {/* ЛІВА КОЛОНКА - ТОВАРИ */}
+                    <div className="col-lg-7">
+                        {items.length === 0 ? (
+                            <div className="text-center py-5 bg-light rounded-3">
+                                <h3>Your cart is empty</h3>
+                                <Link href="/catalog" className="btn btn-dark mt-3">Go Shopping</Link>
+                            </div>
+                        ) : (
+                            <div className="d-flex flex-column gap-4">
+                                {items.map((item) => (
+                                    <div key={item.id} className="d-flex align-items-center gap-3 py-3 border-bottom position-relative">
+
+                                        {/* Картинка */}
+                                        <div style={{ width: "90px", height: "90px", position: "relative", flexShrink: 0 }}>
+                                            <Image
+                                                src={item.product.imageUrl || "/img/placeholder.png"}
+                                                alt={item.product.name}
+                                                fill
+                                                style={{ objectFit: "contain" }}
+                                            />
+                                        </div>
+
+                                        {/* Інфо */}
+                                        <div className="flex-grow-1">
+                                            <div className="fw-bold text-dark" style={{ fontSize: "16px" }}>
+                                                {item.product.name}
+                                            </div>
+                                            <div className="text-muted small">ID: #{item.product.id}</div>
+                                        </div>
+
+                                        {/* Лічильник */}
+                                        <div className="d-flex align-items-center gap-3">
+                                            <button
+                                                className="btn btn-light btn-sm rounded-3 px-2"
+                                                onClick={() => updateQuantity(item.product.id, item.quantity - 1)}
+                                                disabled={item.quantity <= 1}
+                                            >
+                                                <FiMinus size={14} />
+                                            </button>
+                                            <span className="fw-medium" style={{ minWidth: "20px", textAlign: "center" }}>
+                                                {item.quantity}
+                                            </span>
+                                            <button
+                                                className="btn btn-light btn-sm rounded-3 px-2"
+                                                onClick={() => updateQuantity(item.product.id, item.quantity + 1)}
+                                            >
+                                                <FiPlus size={14} />
+                                            </button>
+                                        </div>
+
+                                        {/* Ціна */}
+                                        <div className="fw-bold fs-5 text-end" style={{ minWidth: "80px" }}>
+                                            ${item.product.price * item.quantity}
+                                        </div>
+
+                                        {/* Видалити */}
+                                        <button
+                                            onClick={() => handleRemove(item.product.id)}
+                                            className="btn btn-link text-secondary p-0 ms-2"
+                                        >
+                                            <FiX size={20} />
+                                        </button>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
                     </div>
 
-                    <div className="flex-grow-1">
-                      <div className="fw-medium" style={{ fontSize: 14, lineHeight: 1.2 }}>
-                        {it.title}
-                      </div>
-                      <div className="text-secondary" style={{ fontSize: 12 }}>
-                        {it.sku}
-                      </div>
-                    </div>
+                    {/* ПРАВА КОЛОНКА - SUMMARY */}
+                    <div className="col-lg-5">
+                        <div className="p-4 rounded-4 border" style={{ boxShadow: "0 4px 24px rgba(0,0,0,0.02)" }}>
+                            <h4 className="fw-bold mb-4">Order Summary</h4>
 
-                    <div className="d-flex align-items-center gap-2">
-                      <button
-                        type="button"
-                        className="btn btn-sm btn-light border"
-                        style={{ width: 32, height: 32 }}
-                        onClick={() => dec(it.id)}
-                      >
-                        −
-                      </button>
+                            {/* Промокоди (заглушки) */}
+                            <div className="mb-3">
+                                <label className="form-label text-muted small">Discount code / Promo code</label>
+                                <div className="input-group">
+                                    <input type="text" className="form-control" placeholder="Code" />
+                                </div>
+                            </div>
 
-                      <div
-                        className="border rounded text-center"
-                        style={{ width: 40, height: 32, lineHeight: "32px", fontSize: 13, background: "#fff" }}
-                      >
-                        {it.qty}
-                      </div>
+                            <div className="mb-4">
+                                <label className="form-label text-muted small">Your bonus card number</label>
+                                <div className="input-group">
+                                    <input type="text" className="form-control" placeholder="Enter Card Number" />
+                                    <button className="btn btn-outline-dark">Apply</button>
+                                </div>
+                            </div>
 
-                      <button
-                        type="button"
-                        className="btn btn-sm btn-light border"
-                        style={{ width: 32, height: 32 }}
-                        onClick={() => inc(it.id)}
-                      >
-                        +
-                      </button>
-                    </div>
+                            {/* Розрахунки */}
+                            <div className="d-flex justify-content-between mb-2">
+                                <span className="fw-medium">Subtotal</span>
+                                <span className="fw-bold">${subtotal}</span>
+                            </div>
+                            <div className="d-flex justify-content-between mb-2 text-muted">
+                                <span>Estimated Tax</span>
+                                <span>${items.length > 0 ? tax : 0}</span>
+                            </div>
+                            <div className="d-flex justify-content-between mb-4 text-muted">
+                                <span>Estimated shipping & Handling</span>
+                                <span>${items.length > 0 ? shipping : 0}</span>
+                            </div>
 
-                    <div className="fw-semibold" style={{ width: 70, textAlign: "right" }}>
-                      ${it.price}
-                    </div>
+                            <div className="d-flex justify-content-between mb-4 fs-5 fw-bold">
+                                <span>Total</span>
+                                <span>${items.length > 0 ? total : 0}</span>
+                            </div>
 
-                    <button
-                      type="button"
-                      className="btn btn-sm"
-                      onClick={() => remove(it.id)}
-                      style={{ width: 32, height: 32, borderRadius: 8, border: "1px solid transparent" }}
-                      aria-label="Remove item"
-                    >
-                      ✕
-                    </button>
-                  </div>
-
-                  {/* Mobile row */}
-                  <div className="d-flex d-md-none align-items-start gap-3">
-                    <div style={{ width: 56, height: 56, position: "relative", flex: "0 0 auto" }}>
-                      <Image src={it.img} alt={it.title} fill style={{ objectFit: "contain" }} sizes="56px" />
-                    </div>
-
-                    <div className="flex-grow-1">
-                      <div className="fw-medium" style={{ fontSize: 12, lineHeight: 1.2, maxWidth: 180 }}>
-                        {it.title}
-                      </div>
-                      <div className="text-secondary" style={{ fontSize: 11, marginTop: 2 }}>
-                        {it.sku}
-                      </div>
-
-                      {/* controls row like in mock */}
-                      <div className="d-flex align-items-center justify-content-between mt-2">
-                        <div className="d-flex align-items-center gap-2">
-                          <button
-                            type="button"
-                            className="btn btn-sm btn-light border"
-                            style={{ width: 28, height: 28, padding: 0 }}
-                            onClick={() => dec(it.id)}
-                          >
-                            −
-                          </button>
-
-                          <div
-                            className="border rounded text-center"
-                            style={{ width: 34, height: 28, lineHeight: "28px", fontSize: 12, background: "#fff" }}
-                          >
-                            {it.qty}
-                          </div>
-
-                          <button
-                            type="button"
-                            className="btn btn-sm btn-light border"
-                            style={{ width: 28, height: 28, padding: 0 }}
-                            onClick={() => inc(it.id)}
-                          >
-                            +
-                          </button>
+                            <button
+                                className="btn btn-dark w-100 py-3 fw-bold rounded-3"
+                                onClick={() => alert("Checkout flow coming soon!")}
+                                disabled={items.length === 0}
+                            >
+                                Checkout
+                            </button>
                         </div>
-
-                        <div className="fw-semibold" style={{ fontSize: 13 }}>
-                          ${it.price}
-                        </div>
-                      </div>
                     </div>
-
-                    {/* remove */}
-                    <button
-                      type="button"
-                      className="btn btn-sm"
-                      onClick={() => remove(it.id)}
-                      style={{ width: 28, height: 28, padding: 0, borderRadius: 8, border: "1px solid transparent" }}
-                      aria-label="Remove item"
-                    >
-                      ✕
-                    </button>
-                  </div>
                 </div>
-              ))}
-
-              {!items.length && (
-                <div className="text-secondary" style={{ fontSize: 14 }}>
-                  Cart is empty.
-                </div>
-              )}
             </div>
-          </div>
-
-          {/* RIGHT */}
-          <div className="col-12 col-lg-5">
-            <div className="border rounded-4 p-3 p-lg-4" style={{ background: "#fff", borderColor: "#eee" }}>
-              <div className="fw-semibold mb-3" style={{ fontSize: 18 }}>
-                Order Summary
-              </div>
-
-              <div className="mb-3">
-                <div className="text-secondary mb-2" style={{ fontSize: 12 }}>
-                  Discount code / Promo code
-                </div>
-                <input className="form-control" placeholder="Code" style={{ height: 44, fontSize: 13 }} />
-              </div>
-
-              <div className="mb-4">
-                <div className="text-secondary mb-2" style={{ fontSize: 12 }}>
-                  Your bonus card number
-                </div>
-                <div className="input-group">
-                  <input className="form-control" placeholder="Enter Card Number" style={{ height: 44, fontSize: 13 }} />
-                  <button className="btn btn-outline-dark" type="button" style={{ height: 44 }}>
-                    Apply
-                  </button>
-                </div>
-              </div>
-
-              <div className="d-flex justify-content-between mb-2" style={{ fontSize: 13 }}>
-                <span className="text-secondary">Subtotal</span>
-                <span className="fw-semibold">${subtotal}</span>
-              </div>
-
-              <div className="d-flex justify-content-between mb-2" style={{ fontSize: 13 }}>
-                <span className="text-secondary">Estimated Tax</span>
-                <span className="fw-semibold">${items.length ? tax : 0}</span>
-              </div>
-
-              <div className="d-flex justify-content-between mb-3" style={{ fontSize: 13 }}>
-                <span className="text-secondary">Estimated shipping &amp; Handling</span>
-                <span className="fw-semibold">${items.length ? shipping : 0}</span>
-              </div>
-
-              <div className="d-flex justify-content-between mb-4" style={{ fontSize: 14 }}>
-                <span className="fw-semibold">Total</span>
-                <span className="fw-semibold">${total}</span>
-              </div>
-
-              <button
-                type="button"
-                className="btn btn-dark w-100"
-                style={{ height: 48, borderRadius: 10, fontWeight: 600 }}
-              >
-                Checkout
-              </button>
-            </div>
-          </div>
         </div>
-      </div>
-    </div>
-  );
+    );
 }

@@ -4,6 +4,7 @@ import Image from "next/image";
 import logo from "../images/logo.svg"; // Перевір шлях до лого
 import Submenu from "./Submenu";
 import { useAuth } from "@/context/AuthContext"; // Перевір шлях до контексту
+import SearchBar from "@/components/SearchBar";
 
 export default function Header() {
     const { user, logout } = useAuth();
@@ -23,18 +24,7 @@ export default function Header() {
                         </div>
 
                         {/* Search */}
-                        <div className="col d-none d-md-block px-3">
-                            <div className="input-group">
-                                <span className="input-group-text bg-white border-end-0">
-                                    <i className="bi bi-search"></i>
-                                </span>
-                                <input
-                                    type="text"
-                                    className="form-control border-start-0"
-                                    placeholder="Search products..."
-                                />
-                            </div>
-                        </div>
+                        <SearchBar />
 
                         {/* Navigation Links */}
                         <div className="col-auto d-none d-xl-flex gap-3">

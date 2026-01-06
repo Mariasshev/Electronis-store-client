@@ -3,8 +3,10 @@
 import Image from "next/image";
 import { useState } from "react";
 import { FiCheckCircle, FiXCircle, FiTruck, FiHome, FiHeart } from "react-icons/fi";
-import { FaHeart } from "react-icons/fa"; // Зафарбоване серце
-import { useWishlist } from "@/context/WishlistContext"; // Наш хук
+import { FaHeart } from "react-icons/fa";
+import { useWishlist } from "@/context/WishlistContext";
+import { useCart } from "@/context/CartContext";
+import { useRouter } from "next/navigation";
 import styles from "../../styles/ProductTop.module.css";
 
 interface ProductMemory {
@@ -39,12 +41,12 @@ interface ProductTopProps {
 }
 
 export default function ProductTop({ product }: ProductTopProps) {
-
+    const router = useRouter();
     // 1. ПІДКЛЮЧАЄМО КОНТЕКСТ ВІШЛИСТА
     const { isInWishlist, addToWishlist, removeFromWishlist } = useWishlist();
 
     const [activeImgIndex, setActiveImgIndex] = useState(0);
-    const [inCart, setInCart] = useState(false);
+    const { isInCart, addToCart } = useCart();
 
     // Стейт для РУЧНОГО вибору користувача
     const [userSelectedColor, setUserSelectedColor] = useState<ProductColor | null>(null);
@@ -53,6 +55,7 @@ export default function ProductTop({ product }: ProductTopProps) {
     // 2. БЕРЕМО ID З ПРОДУКТУ (params тут недоступні)
     const productId = product?.id || 0;
     const isWishlisted = isInWishlist(productId);
+    const isAddedToCart = isInCart(productId);
 
     // 3. ОБРОБНИК КЛІКУ ПО СЕРЦЮ
     const handleWishlistClick = () => {
@@ -61,6 +64,18 @@ export default function ProductTop({ product }: ProductTopProps) {
             removeFromWishlist(productId);
         } else {
             addToWishlist(productId);
+        }
+    };
+
+    const handleCartClick = () => {
+        if (!isAvailable) return;
+
+        if (isAddedToCart) {
+            // Якщо вже в корзині - переходимо на сторінку корзини
+            router.push('/cart');
+        } else {
+            // Якщо ні - додаємо
+            addToCart(productId);
         }
     };
 
@@ -246,16 +261,18 @@ export default function ProductTop({ product }: ProductTopProps) {
                             </button>
 
                             <button
-                                className={`${styles.cartBtn} ${inCart ? styles.cartActive : ""}`}
-                                onClick={() => isAvailable && setInCart(!inCart)}
+                                className={`${styles.cartBtn} ${isAddedToCart ? styles.cartActive : ""}`}
+                                onClick={handleCartClick}
                                 disabled={!isAvailable}
                                 style={{
                                     opacity: isAvailable ? 1 : 0.6,
                                     cursor: isAvailable ? 'pointer' : 'not-allowed',
-                                    background: isAvailable ? '#111' : '#555'
+                                    background: isAvailable ? (isAddedToCart ? '#fff' : '#111') : '#555',
+                                    color: isAddedToCart ? '#111' : '#fff',
+                                    border: isAddedToCart ? '1px solid #111' : 'none'
                                 }}
                             >
-                                {isAvailable ? (inCart ? "In Cart" : "Add to Cart") : "Not Available"}
+                                {isAvailable ? (isAddedToCart ? "In Cart" : "Add to Cart") : "Not Available"}
                             </button>
                         </div>
 
