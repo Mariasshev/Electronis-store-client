@@ -72,7 +72,7 @@ export default function ProductCard({ id, title, price, image }: ProductCardProp
                 <button
                     className={styles.buyBtn}
                     type="button"
-                    onClick={() => toast.success("Added to Cart (Demo)")}
+                    onClick={() => toast.success("Added to Cart ")}
                 >
                     Buy Now
                 </button>

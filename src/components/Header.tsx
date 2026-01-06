@@ -1,13 +1,17 @@
 "use client";
 import Link from "next/link";
 import Image from "next/image";
-import logo from "../images/logo.svg"; // Перевір шлях до лого
+import logo from "../images/logo.svg";
 import Submenu from "./Submenu";
-import { useAuth } from "@/context/AuthContext"; // Перевір шлях до контексту
+import { useAuth } from "@/context/AuthContext";
 import SearchBar from "@/components/SearchBar";
+import { useWishlist } from "@/context/WishlistContext";
+import { useCart } from "@/context/CartContext";
 
 export default function Header() {
     const { user, logout } = useAuth();
+    const { wishlistIds } = useWishlist();
+    const { cartItems } = useCart();
 
     return (
         <>
@@ -36,12 +40,30 @@ export default function Header() {
                         {/* Icons + Auth Section */}
                         <div className="col-auto d-flex align-items-center gap-3 justify-content-end">
 
-                            <Link href="/wishlist" className="text-decoration-none text-dark position-relative">
+                            {/* WISHLIST */}
+                            <Link href="/account?tab=my-wishlist" className="text-decoration-none text-dark position-relative me-3">
                                 <i className="bi bi-heart fs-5 text-primary"></i>
+
+                                {/* Показуємо бейдж, тільки якщо там щось є */}
+                                {wishlistIds.length > 0 && (
+                                    <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style={{ fontSize: '0.65rem' }}>
+            {wishlistIds.length}
+                                        <span className="visually-hidden">wishlist items</span>
+        </span>
+                                )}
                             </Link>
 
+                            {/* CART */}
                             <Link href="/cart" className="text-decoration-none text-dark position-relative">
                                 <i className="bi bi-cart2 fs-5 text-primary"></i>
+
+                                {/* Показуємо бейдж, тільки якщо там щось є */}
+                                {cartItems.length > 0 && (
+                                    <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style={{ fontSize: '0.65rem' }}>
+            {cartItems.length}
+                                        <span className="visually-hidden">items in cart</span>
+        </span>
+                                )}
                             </Link>
 
                             <div className="vr d-none d-sm-block mx-1"></div>
